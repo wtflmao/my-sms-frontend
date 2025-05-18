@@ -10,6 +10,7 @@
     lastSuccessfulData 
   } from '$lib/stores/smsStore';
   import type { SMSEntry } from '../../../my-sms-forwarder/src/types'; // Adjust path if needed
+  import { env } from '$env/dynamic/public';
 
   const AUTO_REFRESH_INTERVAL_MS = 5000;
   let autoRefreshTimer: any = null;
@@ -19,7 +20,7 @@
     $isLoading = true;
     $error = null;
     try {
-      const response = await fetch('/api/verify-captcha', {
+      const response = await fetch(`${env.PUBLIC_API_BASE_URL}/api/verify-captcha`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token }),
@@ -59,7 +60,7 @@
     // $error = null; // Don't clear previous error on auto-refresh, only on manual or new verification
 
     try {
-      const response = await fetch('/api/sms');
+      const response = await fetch(`${env.PUBLIC_API_BASE_URL}/api/sms`);
       
       if (response.status === 204) { // Cooldown: No new data
         // smsMessages store remains unchanged, UI shows lastSuccessfulData implicitly
