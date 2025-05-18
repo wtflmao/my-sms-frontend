@@ -188,11 +188,12 @@
   {/if}
 
   {#if $isTurnstileVerified}
+    <!-- Button is disabled if loading, unless auto-refresh is paused (then manual refresh is important to re-auth) -->
     <div class="controls my-6 text-center">
       <button 
         on:click={handleManualRefresh} 
         class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out disabled:opacity-50"
-        disabled={$isLoading && !$isAutoRefreshPaused} <!-- Disable if loading, unless it's paused (then manual refresh is important) -->
+        disabled={$isLoading && !$isAutoRefreshPaused}
       >
         {#if $isLoading && !$isAutoRefreshPaused}Loading...{:else}Manually Refresh Messages{/if}
       </button>
