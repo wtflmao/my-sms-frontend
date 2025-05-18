@@ -22,6 +22,7 @@
     try {
       const response = await fetch(`${env.PUBLIC_API_BASE_URL}/api/verify-captcha`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token }),
       });
@@ -60,7 +61,9 @@
     // $error = null; // Don't clear previous error on auto-refresh, only on manual or new verification
 
     try {
-      const response = await fetch(`${env.PUBLIC_API_BASE_URL}/api/sms`);
+      const response = await fetch(`${env.PUBLIC_API_BASE_URL}/api/sms`, {
+        credentials: 'include',
+      });
       
       if (response.status === 204) { // Cooldown: No new data
         // smsMessages store remains unchanged, UI shows lastSuccessfulData implicitly
