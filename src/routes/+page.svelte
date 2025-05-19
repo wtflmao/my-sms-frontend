@@ -121,19 +121,17 @@
 
   function handleManualRefresh() {
     console.log('Manual refresh triggered.');
-    if ($isAutoRefreshPaused || !$isTurnstileVerified) { // If paused (likely JWT issue) or never verified, re-verify Turnstile
-        if (turnstileWidgetRef) {
-            $error = null; // Clear previous errors for new verification attempt
-            turnstileWidgetRef.reset(); // This will trigger onToken -> verifyTurnstileToken -> fetchMessages
-        } else {
-            // This case should ideally not happen if Turnstile is always present when needed
-            console.error("Turnstile widget reference not available for reset.");
-            // Fallback or direct attempt to fetch, which might fail if JWT is needed and expired.
-            // For now, we primarily rely on Turnstile reset.
-        }
-    } else {
-        fetchMessages(true); // Fetch immediately, not necessarily re-verifying Turnstile if already verified and not paused
+    if ($isAutoRefreshPaused) { // Session expired: show Turnstile widget again
+      $error = null; // Clear previous errors
+      $isTurnstileVerified = false; // Trigger re-render of TurnstileWidget
+      return;
     }
+    if (!$isTurnstileVerified) {
+      // Not verified yet: wait for user to complete Turnstile
+      return;
+    }
+    // Already verified and not paused: perform manual fetch
+    fetchMessages(true);
   }
   
   function handleTurnstileError() {
@@ -242,6 +240,9 @@
 
   <footer class="mt-12 text-center text-sm text-gray-500">
     <p>SMS Forwarder Display</p>
+    <a href="https://github.com/wtflmao/my-sms-frontend" target="_blank" rel="noopener noreferrer" class="inline-block mt-2">
+      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.svg" alt="GitHub Repository" class="h-6 w-6"/>
+    </a>
   </footer>
 </div>
 
