@@ -215,8 +215,9 @@
         </div>
       {:else}
         {@const displayMessages = $smsMessages.length > 0 ? $smsMessages : $lastSuccessfulData}
-        {#each displayMessages as message (message.id)}
-          <article class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow duration-200">
+        {@const sortedMessages = displayMessages.slice().sort((a, b) => new Date(b.receivedAt).getTime() - new Date(a.receivedAt).getTime())}
+        {#each sortedMessages as message (message.id)}
+          <article class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow duration-200 border border-dashed border-gray-300">
             <header class="mb-2 border-b pb-2">
               <p class="text-xs text-gray-500">
                 ID: <span class="font-mono">{message.id}</span>
