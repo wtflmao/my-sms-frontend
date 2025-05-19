@@ -10,42 +10,72 @@
   let turnstileContainer: HTMLElement;
   let widgetId: string | null = null;
 
+  // Add dynamic script loader to ensure Turnstile API is loaded
+  function loadTurnstileScript(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (typeof window === 'undefined') {
+        return reject(new Error('window not available'));
+      }
+      if ((window as any).turnstile) {
+        return resolve();
+      }
+      const src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+      let script = document.querySelector(`script[src="${src}"]`) as HTMLScriptElement | null;
+      if (!script) {
+        script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.defer = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('Turnstile script failed to load'));
+        document.head.appendChild(script);
+      } else {
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('Turnstile script failed to load'));
+      }
+    });
+  }
+
+  // Replace onMount logic to wait for script
   onMount(() => {
-    if (typeof window !== 'undefined' && window.turnstile) {
-      widgetId = window.turnstile.render(turnstileContainer, {
-        sitekey: PUBLIC_TURNSTILE_SITE_KEY,
-        callback: function(token: string) {
-          console.log('Turnstile token received:', token);
-          onToken(token);
-        },
-        'expired-callback': function() {
-          console.log('Turnstile token expired');
-          widgetId = null; // Allow re-rendering or reset
-          onExpired();
-        },
-        'error-callback': function() {
-          console.error('Turnstile error');
-          widgetId = null;
-          onError();
-        },
-        // theme: 'light', // or 'dark', or 'auto'
-        // language: 'en', // or 'auto'
+    let cancelled = false;
+    loadTurnstileScript()
+      .then(() => {
+        if (cancelled || !(window as any).turnstile) return;
+        widgetId = (window as any).turnstile.render(turnstileContainer, {
+          sitekey: PUBLIC_TURNSTILE_SITE_KEY,
+          callback: (token: string) => {
+            console.log('Turnstile token received:', token);
+            onToken(token);
+          },
+          'expired-callback': () => {
+            console.log('Turnstile token expired');
+            widgetId = null;
+            onExpired();
+          },
+          'error-callback': () => {
+            console.error('Turnstile error');
+            widgetId = null;
+            onError();
+          },
+        });
+      })
+      .catch((err) => {
+        console.error('Turnstile script failed to load or window.turnstile not available.', err);
+        onError();
       });
-    } else {
-      console.error('Turnstile script not loaded or window.turnstile not available.');
-      onError(); // Notify parent of an issue
-    }
 
     return () => {
-      if (widgetId && window.turnstile) {
-        window.turnstile.remove(widgetId);
+      cancelled = true;
+      if (widgetId && (window as any).turnstile) {
+        (window as any).turnstile.remove(widgetId);
       }
     };
   });
 
   export function reset() {
-    if (widgetId && window.turnstile) {
-      window.turnstile.reset(widgetId);
+    if (widgetId && (window as any).turnstile) {
+      (window as any).turnstile.reset(widgetId);
     }
   }
 </script>

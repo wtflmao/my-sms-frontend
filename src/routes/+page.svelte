@@ -241,7 +241,7 @@
   <footer class="mt-12 text-center text-sm text-gray-500">
     <p>SMS Forwarder Display</p>
     <a href="https://github.com/wtflmao/my-sms-frontend" target="_blank" rel="noopener noreferrer" class="inline-block mt-2">
-      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.svg" alt="GitHub Repository" class="h-6 w-6"/>
+      <img src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png" alt="GitHub Repository" class="h-6 w-6" height="40" width="40"/>
     </a>
   </footer>
 </div>
