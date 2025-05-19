@@ -230,10 +230,10 @@
                   From: <span class="font-medium">{message.source}</span>
                 </p>
               {/if}
-            </header>
-            <div class="text-gray-700 whitespace-pre-wrap">
+              <p class="text-xs text-gray-500">
               {@html typeof message.payload?.text === 'string' ? message.payload.text : JSON.stringify(message.payload, null, 2)}
-            </div>
+            </p>
+          </header>
           </article>
         {/each}
       {/if}
